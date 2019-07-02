@@ -1,5 +1,6 @@
 ﻿using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -7,8 +8,18 @@ namespace TicketReservation.Server
 {
     class Program
     {
+
+
+
         static void Main(string[] args)
         {
+
+            Dictionary<string, string> organs = new Dictionary<string, string>
+            {
+                {"X","Airline" },
+                {"Y","ATC" }
+            };
+
             string result = string.Empty;
 
             Console.WriteLine("Inicializando Server...");
@@ -17,42 +28,15 @@ namespace TicketReservation.Server
             using (var channel = connection.CreateModel())
             {
                 Console.WriteLine("Server inciado.");
-
-                Console.WriteLine("Inicializando Fila...");
-                channel.QueueDeclare(queue: "hello",
-                            durable: false,
-                            exclusive: false,
-                            autoDelete: false,
-                            arguments: null);
-                Console.WriteLine($"Fila [hello] iniciada.");
-
-                channel.QueueDeclare(queue: "teste",
-                            durable: false,
-                            exclusive: false,
-                            autoDelete: false,
-                            arguments: null);
-
-                Console.WriteLine($"Fila [teste] iniciada.");
-
-
-
                 while (result.ToUpper() != "E")
                 {
                     Console.WriteLine("Press [E] to exit.");
-                    Console.WriteLine("Press [H] to send Message to Hello queue.");
-                    Console.WriteLine("Press [T] to send Message to Teste queue.");
+                    Console.WriteLine("Press [X] to send Message to Airline.");
+                    Console.WriteLine("Press [Y] to send Message to ATC.");
                     result = Console.ReadLine();
 
-                    if (result.ToUpper() == "E")
-                        break;
-                    else if (result.ToUpper() == "H")
-                    {
-                        SendMessage(channel, "hello");
-                    }
-                    else if (result.ToUpper() == "T")
-                    {
-                        SendMessage(channel, "teste");
-                    }
+                    SendMessage(channel, organs[result.ToUpper()]);
+
                 }
             }
         }
@@ -63,9 +47,21 @@ namespace TicketReservation.Server
             string message = "Hello World";
             var body = Encoding.UTF8.GetBytes(message);
 
-            channel.BasicPublish(exchange: "",
-                routingKey: queue,
-                basicProperties: null,
+            Dictionary<string, object> dictionary = new Dictionary<string, object>
+            {
+                { "organ", queue }
+            };
+
+
+            var properties = channel.CreateBasicProperties();
+            properties.Persistent = true;
+
+            properties.Headers = dictionary;
+
+
+            channel.BasicPublish(exchange: "amq.headers",
+                "",
+                basicProperties: properties,
                 body: body);
 
             Console.WriteLine($"[x] Sent {message} to {queue} queue");

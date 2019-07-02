@@ -32,22 +32,22 @@ namespace TicketReservation.Client
                     Console.WriteLine(" [Consumer Hello] Received {0}", message);
                 };
 
-                channel.BasicConsume(queue: "hello",
+                channel.BasicConsume(queue: "AZU",
                                      autoAck: true,
                                      consumer: consumerHello);
 
 
-                var consumerTeste = new EventingBasicConsumer(channel);
-                consumerTeste.Received += (model, ea) =>
-                {
-                    var body = ea.Body;
-                    var message = Encoding.UTF8.GetString(body);
-                    Console.WriteLine(" [Consumer Teste] Received {0}", message);
-                };
+                //var consumerTeste = new EventingBasicConsumer(channel);
+                //consumerTeste.Received += (model, ea) =>
+                //{
+                //    var body = ea.Body;
+                //    var message = Encoding.UTF8.GetString(body);
+                //    Console.WriteLine(" [Consumer AZU] Received {0}", message);
+                //};
 
-                channel.BasicConsume(queue: "teste",
-                                     autoAck: true,
-                                     consumer: consumerTeste);
+                //channel.BasicConsume(queue: "teste",
+                //                     autoAck: true,
+                //                     consumer: consumerTeste);
 
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
